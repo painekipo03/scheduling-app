@@ -50,22 +50,22 @@ export default function App() {
   }, [role]);
 
   async function fetchEmployees() {
-    const { data } = await supabase.from("employees").select("*").eq("is_active", true);
+    const { data } = await supabase.from("員工").select("*").eq("is_active", true);
     if (data) setEmployees(data);
   }
 
   async function fetchAllAvailability() {
-    const { data } = await supabase.from("availability").select("*, employees(name, type)").eq("year_month", YEAR_MONTH);
+    const { data } = await supabase.from("員工填寫的可用時間").select("*, 員工(name, type)").eq("year_month", YEAR_MONTH);
     if (data) setAllAvailability(data);
   }
 
   async function fetchSchedules() {
-    const { data } = await supabase.from("schedules").select("*, employees(name)").eq("status", "published");
+    const { data } = await supabase.from("預排的班表").select("*, 員工(name)").eq("status", "published");
     if (data) setSchedules(data);
   }
 
   async function fetchEmployeeAvailability(empId) {
-    const { data } = await supabase.from("availability").select("*").eq("employee_id", empId).eq("year_month", YEAR_MONTH);
+    const { data } = await supabase.from("員工填寫的可用時間").select("*").eq("employee_id", empId).eq("year_month", YEAR_MONTH);
     if (data && data.length > 0) {
       const d = {};
       data.forEach(row => { d[row.day_of_week] = row.shift; });
@@ -82,7 +82,7 @@ export default function App() {
       setView("boss");
       return;
     }
-    const { data } = await supabase.from("employees").select("*").ilike("name", loginName.trim()).eq("is_active", true).single();
+    const { data } = await supabase.from("員工").select("*").ilike("name", loginName.trim()).eq("is_active", true).single();
     if (data) {
       setEmployee(data);
       setRole("employee");
@@ -102,8 +102,8 @@ export default function App() {
       day_of_week: parseInt(day),
       shift,
     }));
-    await supabase.from("availability").delete().eq("employee_id", employee.id).eq("year_month", YEAR_MONTH);
-    await supabase.from("availability").insert(rows);
+    await supabase.from("員工填寫的可用時間").delete().eq("employee_id", employee.id).eq("year_month", YEAR_MONTH);
+    await supabase.from("員工填寫的可用時間").insert(rows);
     setSaving(false);
     setSaved(true);
     setTimeout(() => setSaved(false), 2500);
